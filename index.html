@@ -705,3 +705,315 @@ function renderLatest(){
     return '<button class="rv" type="button" data-test="'+id+'" aria-label="'+esc(t.name)+' '+v+' '+t.unit+', '+VERDICT_LABEL[vd]+'"><span class="nm">'+esc(t.name)+'</span><div class="vl">'+v+' <small>'+esc(t.unit)+'</small></div><div class="vd '+vd+'">'+VERDICT_LABEL[vd]+'</div></button>';
   }).join('');
   var total=Object.keys(rep.values).length;
+  var pill=flags.length?'<span class="pill warn">'+flags.length+' of '+total+' need attention</span>':'<span class="pill ok">All in range</span>';
+  box.innerHTML='<div class="rep-top"><div class="ic" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div>'
+    +'<div><h2>'+esc(rep.name)+'</h2><div class="sub">'+esc(rep.lab)+' · '+fmtDate(rep.date)+' · '+Object.keys(rep.values).length+' tests'+(rep.sample?' · sample':'')+'</div></div>'
+    +'<div class="flag-pill">'+pill+'</div></div>'
+    +'<div class="rep-vals">'+cells+'</div>'
+    +'<div class="rep-foot"><button class="btn" type="button" id="openRepBtn">See every number</button><button class="btn ghost" type="button" id="askBtn">What to ask my doctor</button><span class="small muted">Tap any number to check it in the decoder.</span></div>';
+  $('#openRepBtn').addEventListener('click',function(){openReport(rep.id)});
+  $('#askBtn').addEventListener('click',function(){safeScroll($('#prep'))});
+  $$('#latestCard .rv').forEach(function(b){b.addEventListener('click',function(){decTest=b.getAttribute('data-test');renderDecoder();safeScroll($('#decoder'));var inp=$('#decVal');inp.value=rep.values[decTest];checkDecoder();})});
+}
+function renderStats(){
+  var rep=latestReport();
+  var flags=rep?flagsOf(rep).length:0;
+  var nextDays=daysBetween(todayISO(),NEXT_TEST.date);
+  $('#statsStrip').innerHTML=
+    '<div class="stat"><b>'+state.reports.length+'</b><span>reports saved</span></div>'
+    +'<div class="stat"><b>'+(rep?Object.keys(rep.values).length:0)+'</b><span>tests in latest report</span></div>'
+    +'<div class="stat '+(flags?'warn':'good')+'"><b>'+flags+'</b><span>'+(flags===1?'number':'numbers')+' need attention</span></div>'
+    +'<div class="stat"><b>'+(nextDays<0?'—':nextDays+'d')+'</b><span>to next test · '+fmtDate(NEXT_TEST.date)+'</span></div>';
+  var rc=$('#repCount');if(rc)rc.textContent=state.reports.length+(state.reports.length===1?' report':' reports')+' saved';
+}
+function renderTestList(){
+  var box=$('#testList');
+  box.innerHTML=TESTS.map(function(t){
+    return '<button type="button" class="tchip'+(t.id===decTest?' on':'')+'" data-id="'+t.id+'" role="option" aria-selected="'+(t.id===decTest)+'"<b>'+esc(t.name)+'</b><span>'+esc(t.panel)+' · '+esc(t.unit)+'</span></button>';
+  }).join('');
+  $$('#testList .tchip').forEach(function(b){b.addEventListener('click',function(){decTest=b.getAttribute('data-id');renderDecoder();})});
+}
+function renderDecoder(){
+  var t=testById(decTest);if(!t)return;
+  var r=rangeFor(t,state.sex);
+  $('#decLabel').textContent='Your '+t.name+' value';
+  $('#decUnit').textContent=t.unit;
+  $('#decVal').value=''; 
+  $('#decVal').placeholder='e.g. '+(t.id==='hba1c'?'5.8':t.id==='vitd'?'18':t.id==='ldl'?'132':'96');
+  $('#decRangeNote').textContent='Normal '+(r.lo===0?'under ':'')+r.lo+' – '+r.hi+' '+t.unit;
+  $('#decLoLab').textContent=r.lo===0?'Low end':'Below '+r.lo;
+  var v=$('#decVerdict');v.className='verdict';v.innerHTML='';
+  var m=$('#decMarker');m.style.left='50%';
+  $$('#testList .tchip').forEach(function(b){var on=b.getAttribute('data-id')===decTest;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false')});
+}
+function checkDecoder(){
+  var t=testById(decTest);if(!t)return;
+  var raw=$('#decVal').value.trim();
+  var v=parseFloat(raw);
+  var box=$('#decVerdict');
+  if(raw===''||isNaN(v)){box.className='verdict';box.innerHTML='';return}
+  var vd=verdictFor(t,v,state.sex);
+  var r=rangeFor(t,state.sex);
+  var lo=r.lo,hi=r.hi;
+  var span=Math.max(hi*1.6,lo*1.6,1);
+  var pct=Math.max(2,Math.min(98,((v-(lo-span*0.35))/(span*1.7))*100));
+  $('#decMarker').style.left=pct+'%';
+  var msg=t[vd]||t.ok;
+  box.className='verdict show '+vd;
+  box.innerHTML='<b>'+esc(t.name)+' '+v+' '+esc(t.unit)+' — '+VERDICT_LABEL[vd]+'</b><p>'+esc(t.what)+' '+esc(msg)+'</p><p class="ask"><strong>Ask your doctor:</strong> '+esc(t.ask)+'</p>';
+}
+function renderReports(){
+  var box=$('#repRail');
+  var rs=state.reports.slice().sort(function(a,b){return b.date<a.date?-1:1});
+  box.innerHTML=rs.map(function(rep){
+    var flags=flagsOf(rep);
+    var chips=flags.slice(0,3).map(function(f){return '<span class="fchip '+(f.verdict==='watch'?'watch':'bad')+'">'+esc(f.test.name)+' '+VERDICT_LABEL[f.verdict]+'</span>'}).join('');
+    if(flags.length>3)chips+='<span class="fchip">+'+(flags.length-3)+' more</span>';
+    if(!flags.length)chips='<span class="fchip">All in range</span>';
+    return '<button class="rep-mini" type="button" data-id="'+rep.id+'"><h3>'+esc(rep.name)+'</h3><div class="meta">'+esc(rep.lab)+' · '+fmtDate(rep.date)+'</div><div class="meta">'+Object.keys(rep.values).length+' tests'+(rep.sample?' · sample':'')+'</div><div class="mini-flags">'+chips+'</div></button>';
+  }).join('');
+  $$('#repRail .rep-mini').forEach(function(b){b.addEventListener('click',function(){openReport(b.getAttribute('data-id'))})});
+}
+function openReport(id){
+  var rep=null;state.reports.forEach(function(r){if(r.id===id)rep=r});
+  if(!rep)return;
+  var rows=Object.keys(rep.values).map(function(tid){
+    var t=testById(tid);if(!t)return '';
+    var v=rep.values[tid],vd=verdictFor(t,v,state.sex),r=rangeFor(t,state.sex);
+    var span=Math.max(r.hi*1.6,r.lo*1.6,1);
+    var pct=Math.max(3,Math.min(97,((v-(r.lo-span*0.35))/(span*1.7))*100));
+    var cls=vd==='ok'?'':vd==='watch'?'watch':'bad';
+    return '<div class="vrow"><div class="vn"><b>'+esc(t.name)+'</b><span>'+esc(t.what)+'</span><div class="vbar"><i class="'+cls+'" style="left:'+Math.max(0,pct-6)+'%;width:12%"></i></div></div><div class="vv">'+v+' <small>'+esc(t.unit)+'</small></div><span class="pill '+(vd==='ok'?'ok':vd==='watch'?'warn':'bad')+'">'+VERDICT_LABEL[vd]+'</span></div>';
+  }).join('');
+  $('#sheetBody').innerHTML='<h2 id="sheetTitle">'+esc(rep.name)+'</h2><p class="small muted">'+esc(rep.lab)+' · '+fmtDate(rep.date)+' · '+Object.keys(rep.values).length+' tests · ranges for '+(state.sex==='F'?'female':'male')+'</p>'+rows
+    +'<p class="small muted" style="margin-top:14px">Bars show where each number sits against its normal range. LabKit explains — it does not diagnose.</p>';
+  $('#sheetBg').classList.add('open');
+}
+function renderTrendPicks(){
+  var ids=['vitd','ldl','hba1c','hb','chol','tsh'];
+  $('#trendPicks').innerHTML=ids.map(function(id){var t=testById(id);return '<button type="button" class="tp'+(id===state.trendTest?' on':'')+'" data-id="'+id+'">'+esc(t.name)+'</button>'}).join('');
+  $$('#trendPicks .tp').forEach(function(b){b.addEventListener('click',function(){state.trendTest=b.getAttribute('data-id');save();renderTrendPicks();renderTrend();})});
+}
+function renderTrend(){
+  var t=testById(state.trendTest);if(!t)return;
+  var pts=state.reports.slice().sort(function(a,b){return a.date<b.date?-1:1}).filter(function(r){return r.values[t.id]!=null}).map(function(r){return {d:r.date,v:r.values[t.id]}});
+  var cv=$('#trendChart');
+  var note=$('#trendNote');
+  if(pts.length<2){note.innerHTML='Add another report with <b>'+esc(t.name)+'</b> to see a trend — one reading is a dot, two make a line.';var cx=cv.getContext&&cv.getContext('2d');if(cx){cx.clearRect(0,0,cv.width,cv.height)}return}
+  var r=rangeFor(t,state.sex);
+  var vals=pts.map(function(p){return p.v});
+  var mn=Math.min.apply(null,vals.concat([r.lo])),mx=Math.max.apply(null,vals.concat([r.hi]));
+  var pad=(mx-mn)*0.25||1;mn-=pad;mx+=pad;
+  var ctx=cv.getContext&&cv.getContext('2d');
+  if(ctx){
+    var W=cv.width,H=cv.height;
+    ctx.clearRect(0,0,W,H);
+    var y=function(v){return H-28-((v-mn)/(mx-mn))*(H-56)};
+    var x=function(i){return 44+i*(W-88)/Math.max(1,pts.length-1)};
+    ctx.fillStyle='rgba(74,122,79,.12)';
+    var yHi=y(r.hi),yLo=y(r.lo);
+    ctx.fillRect(44,Math.min(yHi,yLo),W-88,Math.abs(yLo-yHi));
+    ctx.strokeStyle='#4a7a4f';ctx.setLineDash([5,4]);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(44,yHi);ctx.lineTo(W-44,yHi);ctx.moveTo(44,yLo);ctx.lineTo(W-44,yLo);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#5d4c3a';ctx.font='11px Inter,sans-serif';
+    ctx.fillText('Normal up to '+r.hi,46,yHi-6);ctx.fillText('Normal from '+r.lo,46,yLo+14);
+    ctx.strokeStyle='#c05b2e';ctx.lineWidth=3;ctx.lineJoin='round';ctx.beginPath();
+    pts.forEach(function(p,i){if(i===0)ctx.moveTo(x(i),y(p.v));else ctx.lineTo(x(i),y(p.v))});
+    ctx.stroke();
+    pts.forEach(function(p,i){
+      ctx.fillStyle='#2b2118';ctx.beginPath();ctx.arc(x(i),y(p.v),5,0,7);ctx.fill();
+      ctx.fillStyle='#fffdf7';ctx.beginPath();ctx.arc(x(i),y(p.v),2.2,0,7);ctx.fill();
+      ctx.fillStyle='#2b2118';ctx.font='bold 12px Inter,sans-serif';ctx.textAlign='center';
+      ctx.fillText(p.v+' '+t.unit,x(i),y(p.v)-12);
+      ctx.fillStyle='#8a7661';ctx.font='11px Inter,sans-serif';
+      ctx.fillText(fmtDate(p.d),x(i),H-8);
+    });
+    ctx.textAlign='left';
+  }
+  var first=pts[0].v,last=pts[pts.length-1].v,diff=last-first;
+  var dir=diff>0?'up':'down';
+  var vdLast=verdictFor(t,last,state.sex);
+  note.innerHTML='<b>'+esc(t.name)+'</b> moved from <b>'+first+'</b> to <b>'+last+' '+esc(t.unit)+'</b> ('+(diff>=0?'+':'')+diff+' '+dir+') across '+pts.length+' reports. Latest reading is <b>'+VERDICT_LABEL[vdLast]+'</b>. Normal band: '+r.lo+' – '+r.hi+' '+esc(t.unit)+'.';
+  var mv=$('#movers');
+  var reps=state.reports.slice().sort(function(a,b){return b.date<a.date?-1:1});
+  if(reps.length<2){mv.innerHTML='<p class="small muted">Save a second report to compare.</p>';return}
+  var cur=reps[0],prev=reps[1];
+  var rows=[];
+  Object.keys(cur.values).forEach(function(id){
+    if(prev.values[id]==null)return;
+    var tt=testById(id);if(!tt)return;
+    var d=cur.values[id]-prev.values[id];
+    if(d===0)return;
+    var vd=verdictFor(tt,cur.values[id],state.sex);
+    rows.push('<div class="vrow"><div class="vn"><b>'+esc(tt.name)+'</b><span>'+fmtDate(prev.date)+' → '+fmtDate(cur.date)+'</span></div><div class="vv">'+prev.values[id]+' → '+cur.values[id]+' <small>'+esc(tt.unit)+'</small></div><span class="pill '+(vd==='ok'?'ok':vd==='watch'?'warn':'bad')+'">'+VERDICT_LABEL[vd]+'</span></div>');
+  });
+  mv.innerHTML=rows.length?rows.join(''):'<p class="small muted">No numbers moved since '+fmtDate(prev.date)+'.</p>';
+}
+function renderPrep(){
+  var done=state.prep.filter(Boolean).length;
+  $('#prepCount').textContent=done+' of '+PREP.length+' done';
+  $('#prepPct').textContent=Math.round(done/PREP.length*100)+'%';
+  var ring=$('#prepRing');if(ring)ring.style.strokeDashoffset=String(251.3*(1-done/PREP.length));
+  $('#prepList').innerHTML=PREP.map(function(p,i){
+    return '<label class="checkrow"><input type="checkbox" data-i="'+i+'"'+(state.prep[i]?' checked':'')+'><span><b>'+esc(p.t)+'</b><span>'+esc(p.d)+'</span></span></label>';
+  }).join('');
+  $$('#prepList input').forEach(function(cb){cb.addEventListener('change',function(){state.prep[+cb.getAttribute('data-i')]=cb.checked;save();renderPrep();})});
+  var days=daysBetween(todayISO(),NEXT_TEST.date);
+  $('#nextTestBox').innerHTML='<b>Next test: '+esc(NEXT_TEST.name)+'</b><br><span class="muted">'+fmtDate(NEXT_TEST.date)+' · '+esc(NEXT_TEST.time)+' · '+esc(NEXT_TEST.lab)+' · '+(days<0?'date passed':days===0?'today':days+(days===1?' day':' days')+' away')+'</span>';
+}
+function renderQuestions(){
+  var rep=latestReport();
+  var box=$('#docQuestions');
+  if(!rep){box.innerHTML='<li>Add a report to generate questions.</li>';return}
+  var flags=flagsOf(rep);
+  var items=flags.map(function(f){return f.test.ask});
+  if(!items.length)items=['All my numbers are in range — is there anything I should still check this year?','How often should I repeat this full checkup?'];
+  items=items.slice(0,6);
+  items.push('Is there anything in this report that needs attention before my next visit?');
+  box.innerHTML=items.map(function(q){return '<li>'+esc(q)+'</li>'}).join('');
+}
+function renderGuides(){
+  $('#guideGrid').innerHTML=GUIDES.map(function(g,i){
+    return '<button class="card guide" type="button" data-i="'+i+'"><div class="g-ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg></div><h3>'+esc(g.t)+'</h3><p>'+esc(g.d)+'</p></button>';
+  }).join('');
+  $$('#guideGrid .guide').forEach(function(b){b.addEventListener('click',function(){
+    var g=GUIDES[+b.getAttribute('data-i')];
+    $('#sheetBody').innerHTML='<h2 id="sheetTitle">'+esc(g.t)+'</h2><p style="font-size:15px;margin-top:8px">'+esc(g.body)+'</p><p class="small muted" style="margin-top:14px">LabKit explains. It does not diagnose.</p>';
+    $('#sheetBg').classList.add('open');
+  })});
+}
+function renderAll(){
+  renderLatest();renderStats();renderTestList();renderDecoder();renderReports();
+  renderTrendPicks();renderTrend();renderPrep();renderQuestions();renderGuides();
+}
+
+/* ================= interactions ================= */
+var addRows=[];
+function addRowHTML(){
+  var opts=TESTS.map(function(t){return '<option value="'+t.id+'">'+esc(t.name)+' ('+esc(t.unit)+')</option>'}).join('');
+  var div=document.createElement('div');
+  div.className='addrow';
+  div.innerHTML='<select aria-label="Test">'+opts+'</select><input type="number" step="any" min="0" placeholder="Value" aria-label="Value"><button type="button" aria-label="Remove row">×</button>';
+  div.querySelector('button').addEventListener('click',function(){div.remove()});
+  return div;
+}
+function wire(){
+  /* sex toggle */
+  $('#sexM').addEventListener('click',function(){state.sex='M';save();syncSex();renderAll()});
+  $('#sexF').addEventListener('click',function(){state.sex='F';save();syncSex();renderAll()});
+  function syncSex(){
+    $('#sexM').classList.toggle('on',state.sex==='M');$('#sexF').classList.toggle('on',state.sex==='F');
+    $('#sexM').setAttribute('aria-pressed',state.sex==='M'?'true':'false');
+    $('#sexF').setAttribute('aria-pressed',state.sex==='F'?'true':'false');
+  }
+  window._syncSex=syncSex;syncSex();
+  /* decoder */
+  $('#decCheck').addEventListener('click',checkDecoder);
+  $('#decVal').addEventListener('input',checkDecoder);
+  $('#decAdd').addEventListener('click',function(){
+    var t=testById(decTest);var v=parseFloat($('#decVal').value);
+    if(isNaN(v)){toast('Enter a number first');return}
+    var rep=latestReport();if(!rep){toast('Add a report first');return}
+    rep.values[decTest]=v;save();renderAll();toast(t.name+' saved to '+rep.name);
+  });
+  /* sheets */
+  $('#sheetClose').addEventListener('click',function(){$('#sheetBg').classList.remove('open')});
+  $('#sheetBg').addEventListener('click',function(e){if(e.target===$('#sheetBg'))$('#sheetBg').classList.remove('open')});
+  $('#addClose').addEventListener('click',function(){$('#addBg').classList.remove('open')});
+  $('#addBg').addEventListener('click',function(e){if(e.target===$('#addBg'))$('#addBg').classList.remove('open')});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){$('#sheetBg').classList.remove('open');$('#addBg').classList.remove('open')}});
+  /* add report */
+  $('#addRepBtn').addEventListener('click',function(){
+    var box=$('#addRows');box.innerHTML='';
+    ['hba1c','vitd','ldl'].forEach(function(id){
+      var row=addRowHTML();row.querySelector('select').value=id;box.appendChild(row);
+    });
+    $('#addBg').classList.add('open');
+  });
+  $('#addRowBtn').addEventListener('click',function(){$('#addRows').appendChild(addRowHTML())});
+  $('#saveRepBtn').addEventListener('click',function(){
+    var name=$('#arName').value.trim()||'Blood Test';
+    var lab=$('#arLab').value.trim()||'Lab';
+    var date=$('#arDate').value||todayISO();
+    var values={};
+    $$('#addRows .addrow').forEach(function(row){
+      var id=row.querySelector('select').value;
+      var v=parseFloat(row.querySelector('input').value);
+      if(!isNaN(v))values[id]=v;
+    });
+    if(!Object.keys(values).length){toast('Add at least one test value');return}
+    state.reports.push({id:'r'+Date.now(),name:name,lab:lab,date:date,sample:false,values:values});
+    save();renderAll();
+    $('#addBg').classList.remove('open');
+    toast('Report saved — '+Object.keys(values).length+' tests');
+    safeScroll($('#reports'));
+  });
+  /* remove samples */
+  $('#removeSamplesBtn').addEventListener('click',function(){
+    var before=state.reports.length;
+    state.reports=state.reports.filter(function(r){return !r.sample});
+    if(!state.reports.length){state.reports=state.reports}
+    save();renderAll();
+    toast(before-state.reports.length>0?'Samples removed':'No sample reports to remove');
+  });
+  /* copy helpers */
+  function copyText(txt,msg){
+    function done(){toast(msg)}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,function(){fallback()})}else fallback();
+    function fallback(){var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}ta.remove();done()}
+  }
+  $('#copyQuestions').addEventListener('click',function(){
+    var rep=latestReport();
+    var qs=$$('#docQuestions li').map(function(li){return '- '+li.textContent});
+    copyText('Questions for my doctor ('+(rep?rep.name:'')+'):\n'+qs.join('\n'),'Questions copied');
+  });
+  $('#copySummary').addEventListener('click',function(){
+    var rep=latestReport();if(!rep){toast('No report to summarise');return}
+    var flags=flagsOf(rep);
+    var lines=['LabKit summary — '+rep.name+' ('+fmtDate(rep.date)+', '+rep.lab+')'];
+    Object.keys(rep.values).forEach(function(id){var t=testById(id);if(!t)return;var v=rep.values[id];lines.push(t.name+': '+v+' '+t.unit+' — '+VERDICT_LABEL[verdictFor(t,v,state.sex)])});
+    if(flags.length)lines.push('Needs attention: '+flags.map(function(f){return f.test.name+' '+VERDICT_LABEL[f.verdict]}).join(', '));
+    copyText(lines.join('\n'),'Summary copied');
+  });
+  /* erase all */
+  $('#eraseAllBtn').addEventListener('click',function(){
+    if(!window.confirm('Erase everything in LabKit — all reports, checklist and settings?'))return;
+    var fresh=seedState();fresh.reports=[];fresh.samples=false;fresh.seenIntro=true;
+    for(var k in fresh)state[k]=fresh[k];
+    save();renderAll();toast('Everything erased');
+  });
+  /* intro */
+  var intro=$('#intro');
+  function closeIntro(){intro.classList.add('gone');state.seenIntro=true;save();maybeCoach()}
+  intro.addEventListener('click',closeIntro);
+  $('#skipIntro').addEventListener('click',function(e){e.stopPropagation();closeIntro()});
+  if(state.seenIntro){intro.classList.add('gone');setTimeout(maybeCoach,600)}
+  else{setTimeout(closeIntro,4200)}
+  /* coach */
+  var steps=[
+    {t:'Welcome to LabKit',x:'Your blood test, in plain words. This 30-second tour shows you the three things that matter.'},
+    {t:'1 · Check any number',x:'Pick a test, type the number from your report, and get a plain-words answer — low, in range, high, or watch.'},
+    {t:'2 · Save reports, watch trends',x:'Add each new report and LabKit draws the line — so you and your doctor see the direction, not just one dot.'}
+  ];
+  function maybeCoach(){
+    if(state.coachStep===-1&&!state.seenCoach){state.coachStep=0;showCoach()}
+  }
+  function showCoach(){
+    var s=steps[state.coachStep];
+    $('#coachTitle').textContent=s.t;$('#coachText').textContent=s.x;
+    $('#coachDots').textContent='Step '+(state.coachStep+1)+' of '+steps.length;
+    $('#coachNext').textContent=state.coachStep===steps.length-1?'Done':'Next';
+    $('#coach').classList.add('show');
+  }
+  $('#coachNext').addEventListener('click',function(){
+    if(state.coachStep>=steps.length-1){endCoach();return}
+    state.coachStep++;save();showCoach();
+  });
+  $('#coachSkip').addEventListener('click',endCoach);
+  function endCoach(){$('#coach').classList.remove('show');state.coachStep=-1;state.seenCoach=true;save()}
+}
+renderAll();
+wire();
+</script>
+</body>
+</html>
