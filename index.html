@@ -322,3 +322,50 @@ footer{margin-top:48px;border-top:1px solid var(--line);padding:26px 0 40px}
           <div class="dec-form">
             <label for="decVal" id="decLabel">Your value</label>
             <div class="valrow">
+              <input type="number" id="decVal" inputmode="decimal" step="any" min="0" placeholder="e.g. 5.8" aria-describedby="decRangeNote">
+              <span class="unit" id="decUnit">%</span>
+            </div>
+            <div class="rangebar" aria-hidden="true"><i id="decMarker" style="left:50%"></i></div>
+            <div class="rangelab"><span id="decLoLab">Low</span><span id="decRangeNote">Normal 4.0 – 5.6</span><span>High</span></div>
+            <div class="verdict" id="decVerdict" role="status" aria-live="polite"></div>
+            <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn terra" type="button" id="decCheck">Check my number</button>
+              <button class="btn ghost" type="button" id="decAdd" style="border-color:rgba(247,234,210,.4);color:#f7ead2">Add to latest report</button>
+            </div>
+            <p class="small" style="color:#cbb894;margin-top:12px">A single number never tells the whole story — age, medicines and the rest of your report all matter. This is a starting point for a conversation with your doctor, not a verdict.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- reports -->
+    <section class="block" id="reports">
+      <div class="sec-head">
+        <h2>My reports</h2>
+        <span class="count" id="repCount"></span>
+      </div>
+      <p class="sec-sub">Every report you save stays on this device only. Tap a report to see every number with its range, and how it moved since last time.</p>
+      <div class="rail" id="repRail"></div>
+      <div style="margin-top:6px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" type="button" id="addRepBtn">Add a report</button>
+        <button class="btn ghost" type="button" id="removeSamplesBtn">Remove samples</button>
+      </div>
+    </section>
+
+    <!-- trends -->
+    <section class="block" id="trends">
+      <div class="sec-head">
+        <h2>Trends, not single numbers</h2>
+        <span class="count">from your saved reports</span>
+      </div>
+      <p class="sec-sub">One reading can wobble. The direction over months is what your doctor watches. Pick a test and see your own line.</p>
+      <div class="trend-grid">
+        <div class="card trend-card">
+          <div class="test-pick" id="trendPicks" role="group" aria-label="Pick a test to chart"></div>
+          <canvas id="trendChart" width="640" height="220" aria-label="Trend chart"></canvas>
+          <p class="trend-note" id="trendNote"></p>
+        </div>
+        <div class="card trend-card">
+          <p class="eyebrow">What changed</p>
+          <h3 class="serif" style="font-size:21px;margin-top:6px">Since your last report</h3>
+          <div id="movers" style="margin-top:10px"></div>
