@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LabKit — Your Blood Test, In Plain Words</title>
+<meta name="description" content="LabKit turns a confusing blood-test report into plain words: what each number means, what is low or high, what to ask your doctor — all on your device.">
+<meta name="theme-color" content="#2b2118">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232b2118'/%3E%3Cpath d='M20 44h24M20 32h24M20 20h24' stroke='%23d9a441' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --paper:#faf5ec; --paper2:#f3ead9; --card:#fffdf7; --ink:#2b2118; --ink2:#5d4c3a;
+  --mut:#8a7661; --line:#e5d8c2; --bronze:#b07d3c; --amber:#d9a441; --gold:#e8b64c;
+  --terra:#c05b2e; --terra-d:#9c4520; --green:#4a7a4f; --greenbg:#e9f1e4;
+  --red:#a83a22; --redbg:#fbe9e2; --watch:#9a6a14; --watchbg:#fdf3d7;
+  --okbg:#eef4ea; --r:18px; --sh:0 10px 30px rgba(43,33,24,.10);
+  --sh2:0 22px 55px rgba(43,33,24,.16);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.serif{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.01em}
+img{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:15px;color:var(--ink)}
+a{color:var(--terra)}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1060px;margin:0 auto;padding:0 20px}
+.muted{color:var(--mut)}
+.small{font-size:13px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--bronze)}
+/* ---------- cinematic intro ---------- */
+#intro{position:fixed;inset:0;z-index:200;background:linear-gradient(160deg,#241a10 0%,#3a2a18 55%,#6b4423 100%);color:#f7ead2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;overflow:hidden}
+#intro .rays{position:absolute;inset:-40%;background:conic-gradient(from 0deg,transparent 0 18deg,rgba(232,182,76,.10) 18deg 26deg,transparent 26deg 60deg,rgba(232,182,76,.07) 60deg 68deg,transparent 68deg 360deg);animation:spin 26s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
