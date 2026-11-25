@@ -595,3 +595,52 @@ var TESTS=[
   high:'Clearly high SGPT needs a doctor. Alcohol, fatty liver and medicines are the common causes.',
   ask:'My SGPT is high — is it fatty liver, and what should I change?'},
  {id:'plt',name:'Platelets',unit:'×1000/µL',panel:'Blood',lo:150,hi:450,
+  what:'The cells that help your blood clot. Counted in thousands per microlitre.',
+  low:'Below 150 can mean low platelets — dengue, some medicines or vitamin deficiency. Ask your doctor.',
+  ok:'In the normal band.',
+  watch:'Just below the band — often rechecked in a week or two.',
+  high:'Above 450 can follow an infection or inflammation. Ask your doctor if it stays high.',
+  ask:'My platelets are low — how soon should I repeat this, and what should I watch for?'},
+ {id:'wbc',name:'WBC (White Cells)',unit:'×1000/µL',panel:'Blood',lo:4.0,hi:11.0,
+  what:'The infection-fighting cells in your blood.',
+  low:'Below 4 can mean a recent viral illness or low immunity. Ask your doctor.',
+  ok:'In the normal band.',
+  watch:'Just outside the band — usually rechecked after the illness passes.',
+  high:'Above 11 usually means the body is fighting an infection.',
+  ask:'My white cell count is high — is it an infection, and do I need anything for it?'},
+ {id:'uric',name:'Uric Acid',unit:'mg/dL',panel:'Kidney',sex:true,loM:3.4,hiM:7.0,loF:2.4,hiF:6.0,
+  what:'A waste product from purines in food. High levels can cause gout.',
+  low:'Low uric acid is rarely a problem.',
+  ok:'In the normal band for your sex.',
+  watch:'Just above the band — less red meat, beer and sugary drinks help.',
+  high:'Above the band raises gout risk. Painful, swollen joints are the classic sign. Ask your doctor.',
+  ask:'My uric acid is high — which foods should I cut, and do I need medicine?'},
+ {id:'ferr',name:'Ferritin',unit:'ng/mL',panel:'Vitamins',sex:true,loM:30,hiM:400,loF:15,hiF:150,
+  what:'Your iron stores. Low ferritin means the iron tank is empty, even if haemoglobin looks okay.',
+  low:'Low ferritin is iron deficiency. Hair fall, tiredness and pale skin are common. Ask about iron.',
+  ok:'In the normal band for your sex.',
+  watch:'Near the low edge — worth topping up through food or a supplement your doctor suggests.',
+  high:'High ferritin can mean too much iron or inflammation. Ask your doctor.',
+  ask:'My ferritin is low — how long will iron take to refill my stores?'}
+];
+function testById(id){for(var i=0;i<TESTS.length;i++)if(TESTS[i].id===id)return TESTS[i];return null}
+function rangeFor(t,sex){
+  var lo=t.lo,hi=t.hi;
+  if(t.sex){
+    if(sex==='F'){if(t.loF!=null)lo=t.loF;if(t.hiF!=null)hi=t.hiF}
+    else{if(t.loM!=null)lo=t.loM;if(t.hiM!=null)hi=t.hiM}
+  }
+  return {lo:lo,hi:hi,watchLo:t.watchLo,watchHi:t.watchHi};
+}
+function verdictFor(t,v,sex){
+  if(v==null||isNaN(v))return null;
+  var r=rangeFor(t,sex);
+  if(r.watchLo!=null&&v<r.lo&&v>=r.watchLo)return 'watch';
+  if(v<r.lo)return 'low';
+  if(r.watchHi!=null&&v>r.hi&&v<=r.watchHi)return 'watch';
+  if(v>r.hi)return 'high';
+  return 'ok';
+}
+var VERDICT_LABEL={low:'LOW',high:'HIGH',watch:'WATCH',ok:'IN RANGE'};
+
+var GUIDES=[
