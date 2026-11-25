@@ -212,3 +212,57 @@ footer{margin-top:48px;border-top:1px solid var(--line);padding:26px 0 40px}
 .vbar i{position:absolute;top:0;bottom:0;background:var(--green);border-radius:99px}
 .vbar i.bad{background:var(--terra)} .vbar i.watch{background:var(--amber)}
 /* ---------- forms ---------- */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.form-grid label{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);display:block;margin-bottom:5px}
+.form-grid input,.form-grid select{width:100%;background:#fffdf7;border:1px solid var(--line);border-radius:11px;padding:11px 12px}
+.full{grid-column:1/-1}
+.addrows{margin-top:6px}
+.addrow{display:grid;grid-template-columns:1fr 120px auto;gap:8px;margin-top:8px;align-items:center}
+.addrow select,.addrow input{padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:#fffdf7;width:100%}
+.addrow button{border:1px solid var(--line);background:var(--card);border-radius:10px;width:34px;height:34px;font-size:16px}
+/* ---------- coach ---------- */
+.coach{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:150;width:min(430px,calc(100vw - 32px));background:var(--ink);color:#f7ead2;border-radius:18px;padding:18px 20px;box-shadow:var(--sh2);display:none}
+.coach.show{display:block}
+.coach h3{font-size:18px;color:#fdf6e7}
+.coach p{font-size:14px;color:#e6cfa4;margin-top:5px}
+.coach .row{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
+.coach .btn{padding:9px 16px;font-size:13px}
+.coach .dots{font-size:12px;color:#cbb894;align-self:center;margin-right:auto}
+/* ---------- toast ---------- */
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,80px);background:var(--ink);color:#f7ead2;padding:12px 20px;border-radius:99px;font-size:14px;font-weight:600;z-index:180;transition:transform .3s ease;box-shadow:var(--sh2);opacity:0;pointer-events:none}
+#toast.show{transform:translate(-50%,0);opacity:1}
+@media (max-width:820px){
+  .rep-vals{grid-template-columns:repeat(2,1fr)}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .dec-grid,.trend-grid,.split{grid-template-columns:1fr}
+  .guides{grid-template-columns:1fr 1fr}
+  .form-grid{grid-template-columns:1fr}
+  .top nav{display:none}
+}
+@media (max-width:520px){
+  .guides{grid-template-columns:1fr}
+  .testlist{grid-template-columns:1fr}
+  .rep-card{margin-top:-40px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+
+</style>
+</head>
+<body>
+
+<!-- cinematic intro -->
+<div id="intro" role="button" aria-label="Skip intro" title="Tap to skip">
+  <div class="rays" aria-hidden="true"></div>
+  <div class="mark" aria-hidden="true">
+    <svg width="52" height="52" viewBox="0 0 64 64" fill="none"><path d="M20 44h24M20 32h24M20 20h24" stroke="#b07d3c" stroke-width="5" stroke-linecap="round"/></svg>
+  </div>
+  <h1>Lab<span>Kit</span></h1>
+  <p class="tag">Your blood test, in plain words.</p>
+  <div class="bar" aria-hidden="true"><i></i></div>
+  <button class="skip" type="button" id="skipIntro">Skip intro</button>
+</div>
+
+<!-- header -->
+<header class="top">
