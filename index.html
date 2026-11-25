@@ -654,3 +654,54 @@ var GUIDES=[
 var PREP=[
  {t:'Fast 8–12 hours',d:'Dinner by 9 PM for an 8 AM test. Sugar and lipid tests need this.'},
  {t:'Water is fine',d:'A glass or two of plain water helps the blood draw. No tea, coffee or juice.'},
+ {t:'No alcohol for 24 hours',d:'Alcohol pushes triglycerides and liver enzymes up for a day.'},
+ {t:'Book the morning slot',d:'Fasting is easiest overnight, and most labs draw before 11 AM.'},
+ {t:'Carry your old reports',d:'The lab and your doctor both need the last numbers to compare.'},
+ {t:'Write down your medicines',d:'Some medicines change results. List them, with doses, for the doctor.'},
+ {t:'Skip the heavy workout',d:'A hard gym session the evening before can lift muscle and liver enzymes.'},
+ {t:'Wear a short sleeve',d:'A loose sleeve makes the draw quicker and less bruising.'}
+];
+var NEXT_TEST={date:'2026-11-28',time:'8:00 AM',name:'Full Body Checkup — repeat Vitamin D + LDL',lab:'Thyrocare, BTM Layout'};
+
+/* ---- seed data ---- */
+function seedState(){
+  return {
+    sex:'M', seenIntro:false, coachStep:-1, samples:true,
+    trendTest:'vitd',
+    prep:[false,false,false,false,false,false,false,false],
+    reports:[
+      {id:'r1',name:'Full Body Checkup',lab:'Thyrocare',date:'2026-11-18',sample:true,values:{hba1c:5.8,fbs:96,chol:210,ldl:132,hdl:38,trig:138,hb:13.2,vitd:18,b12:320,tsh:2.1,creat:0.9,sgpt:28}},
+      {id:'r2',name:'Basic Health Check',lab:'Apollo Diagnostics',date:'2026-08-12',sample:true,values:{hba1c:5.6,fbs:91,chol:198,ldl:118,hdl:41,vitd:22,hb:13.8}}
+    ]
+  };
+}
+var state;
+try{state=JSON.parse(localStorage.getItem(LS_KEY))||seedState()}catch(e){state=seedState()}
+if(!state.reports)state=seedState();
+function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(state))}catch(e){}}
+save();
+window.LabKit={state:state,TESTS:TESTS,verdictFor:verdictFor,rangeFor:rangeFor};
+
+/* ================= rendering ================= */
+var decTest='hba1c';
+function latestReport(){
+  var rs=state.reports.slice().sort(function(a,b){return b.date<a.date?-1:1});
+  return rs[0]||null;
+}
+function flagsOf(rep){
+  var out=[];
+  for(var id in rep.values){var t=testById(id);if(!t)continue;var v=verdictFor(t,rep.values[id],state.sex);if(v&&v!=='ok')out.push({id:id,test:t,value:rep.values[id],verdict:v})}
+  return out;
+}
+function renderLatest(){
+  var rep=latestReport();
+  var box=$('#latestCard');
+  if(!rep){box.innerHTML='<p class="muted">No reports yet. Add your first report below.</p>';return}
+  var flags=flagsOf(rep);
+  var ids=Object.keys(rep.values).slice(0,8);
+  var cells=ids.map(function(id){
+    var t=testById(id);if(!t)return '';
+    var v=rep.values[id],vd=verdictFor(t,v,state.sex);
+    return '<button class="rv" type="button" data-test="'+id+'" aria-label="'+esc(t.name)+' '+v+' '+t.unit+', '+VERDICT_LABEL[vd]+'"><span class="nm">'+esc(t.name)+'</span><div class="vl">'+v+' <small>'+esc(t.unit)+'</small></div><div class="vd '+vd+'">'+VERDICT_LABEL[vd]+'</div></button>';
+  }).join('');
+  var total=Object.keys(rep.values).length;
