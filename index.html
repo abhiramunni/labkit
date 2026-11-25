@@ -424,3 +424,66 @@ footer{margin-top:48px;border-top:1px solid var(--line);padding:26px 0 40px}
     <div class="band">
       <img src="labkit-flatlay.webp" alt="A report folder, stethoscope, glasses, notebook and filter coffee on a linen cloth in warm light" loading="lazy">
       <div class="cap">
+        <h2>Keep every report. They are your health's diary.</h2>
+        <p>One folder, one app, every number you have ever been given — so the next doctor visit starts with facts, not guesswork.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <p class="eyebrow">LabKit</p>
+      <p style="margin-top:8px"><strong style="color:var(--ink)">LabKit explains. It does not diagnose.</strong> Reference ranges are standard adult ranges used by Indian labs and are labelled indicative — the range printed on your own report is the one that counts for you. If a number worries you, talk to your doctor, and seek urgent care for severe symptoms.</p>
+      <p style="margin-top:8px">Everything you enter stays in this browser on your device. No account, no uploads, no tracking.</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn ghost" type="button" id="eraseAllBtn">Erase everything</button>
+    </div>
+  </div>
+</footer>
+
+<!-- report detail sheet -->
+<div class="sheet-bg" id="sheetBg" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet">
+    <button class="x" type="button" id="sheetClose" aria-label="Close">×</button>
+    <div id="sheetBody"></div>
+  </div>
+</div>
+
+<!-- add report sheet -->
+<div class="sheet-bg" id="addBg" role="dialog" aria-modal="true" aria-labelledby="addTitle">
+  <div class="sheet">
+    <button class="x" type="button" id="addClose" aria-label="Close">×</button>
+    <h2 id="addTitle">Add a report</h2>
+    <p class="small muted">Enter the date and the numbers you want to keep. You can add more later — a report does not need every test.</p>
+    <div class="form-grid">
+      <div>
+        <label for="arDate">Report date</label>
+        <input type="date" id="arDate" value="2026-11-25">
+      </div>
+      <div>
+        <label for="arLab">Lab / hospital</label>
+        <input type="text" id="arLab" placeholder="e.g. Thyrocare" maxlength="60">
+      </div>
+      <div class="full">
+        <label for="arName">Report name</label>
+        <input type="text" id="arName" placeholder="e.g. Full Body Checkup" maxlength="60">
+      </div>
+    </div>
+    <div class="addrows" id="addRows"></div>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn ghost" type="button" id="addRowBtn">+ Add a test value</button>
+      <button class="btn terra" type="button" id="saveRepBtn">Save report</button>
+    </div>
+  </div>
+</div>
+
+<!-- onboarding coach -->
+<div class="coach" id="coach" role="dialog" aria-label="Quick tour">
+  <h3 id="coachTitle"></h3>
+  <p id="coachText"></p>
+  <div class="row">
+    <span class="dots" id="coachDots"></span>
+    <button class="btn ghost" type="button" id="coachSkip" style="border-color:rgba(247,234,210,.4);color:#f7ead2">Skip tour</button>
