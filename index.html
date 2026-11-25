@@ -369,3 +369,58 @@ footer{margin-top:48px;border-top:1px solid var(--line);padding:26px 0 40px}
           <p class="eyebrow">What changed</p>
           <h3 class="serif" style="font-size:21px;margin-top:6px">Since your last report</h3>
           <div id="movers" style="margin-top:10px"></div>
+          <p class="small muted" style="margin-top:12px">Compared with your previous saved report. Small moves are normal — labs allow a little wobble between visits.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- prep + doctor questions -->
+    <section class="block" id="prep">
+      <div class="sec-head">
+        <h2>Before the test</h2>
+        <span class="count">get the sample right</span>
+      </div>
+      <p class="sec-sub">A wrong sample gives a wrong number. Eight small things, done the night before, and your next report is worth trusting.</p>
+      <div class="split">
+        <div class="card prep">
+          <div class="ringwrap">
+            <div class="ring" role="img" aria-label="Preparation progress">
+              <svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="40" fill="none" stroke="#efe6d3" stroke-width="9"/><circle id="prepRing" cx="48" cy="48" r="40" fill="none" stroke="#c05b2e" stroke-width="9" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="251.3"/></svg>
+              <span class="rv2" id="prepPct">0%</span>
+            </div>
+            <div>
+              <h3 class="serif" style="font-size:20px">Night-before checklist</h3>
+              <p class="small muted" id="prepCount">0 of 8 done</p>
+              <p class="small" style="margin-top:6px">Tick them off as you go. Your list is saved on this device.</p>
+            </div>
+          </div>
+          <div id="prepList"></div>
+          <div class="next-test" id="nextTestBox"></div>
+        </div>
+        <div class="card qcard">
+          <p class="eyebrow">Ask your doctor</p>
+          <h3 class="serif" style="font-size:21px;margin-top:6px">Questions your latest report raises</h3>
+          <p class="small muted" style="margin-top:4px">Built from the numbers that are out of range in your latest report. Take this list to your visit.</p>
+          <ul class="qlist" id="docQuestions"></ul>
+          <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn" type="button" id="copyQuestions">Copy questions</button>
+            <button class="btn ghost" type="button" id="copySummary">Copy full summary</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- guides -->
+    <section class="block" id="guides">
+      <div class="sec-head">
+        <h2>Guides, in plain words</h2>
+        <span class="count">tap one to read it</span>
+      </div>
+      <p class="sec-sub">Six short explainers for the questions everyone asks after their first confusing report.</p>
+      <div class="guides" id="guideGrid"></div>
+    </section>
+
+    <!-- photo band -->
+    <div class="band">
+      <img src="labkit-flatlay.webp" alt="A report folder, stethoscope, glasses, notebook and filter coffee on a linen cloth in warm light" loading="lazy">
+      <div class="cap">
