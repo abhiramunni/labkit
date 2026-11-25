@@ -487,3 +487,40 @@ footer{margin-top:48px;border-top:1px solid var(--line);padding:26px 0 40px}
   <div class="row">
     <span class="dots" id="coachDots"></span>
     <button class="btn ghost" type="button" id="coachSkip" style="border-color:rgba(247,234,210,.4);color:#f7ead2">Skip tour</button>
+    <button class="btn terra" type="button" id="coachNext">Next</button>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<noscript><p style="padding:20px;text-align:center">LabKit needs JavaScript to decode your reports. Please enable it and reload.</p></noscript>
+<script>
+'use strict';
+/* ================= LabKit ================= */
+var LS_KEY='labkit-v1';
+function $(s){return document.querySelector(s)}
+function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
+function safeScroll(el){try{if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'})}catch(e){}}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function fmtDate(iso){var d=parseLocal(iso);if(!d)return iso;var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear()}
+function parseLocal(iso){var p=String(iso||'').split('-');if(p.length!==3)return null;var d=new Date(+p[0],+p[1]-1,+p[2]);return isNaN(d)?null:d}
+function daysBetween(a,b){var da=parseLocal(a),db=parseLocal(b);if(!da||!db)return 0;return Math.round((db-da)/86400000)}
+function todayISO(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')}
+function inr(n){return '₹'+Math.round(n).toLocaleString('en-IN')}
+function toast(msg){var t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._tm);t._tm=setTimeout(function(){t.classList.remove('show')},2600)}
+
+/* ---- test catalogue: standard adult ranges used by Indian labs (indicative) ---- */
+var TESTS=[
+ {id:'hba1c',name:'HbA1c',unit:'%',panel:'Sugar',lo:4.0,hi:5.6,watchHi:6.4,
+  what:'Your average blood sugar over the last 2–3 months.',
+  low:'Below 4% is unusual. Ask your doctor whether it needs a look.',
+  ok:'In the normal band. Keep doing what you are doing.',
+  watch:'5.7–6.4% is the prediabetes band. It is a warning light, not a diagnosis — food and daily walking move this number a lot.',
+  high:'6.5% or more is the diabetes range. See your doctor and do not start or stop any medicine on your own.',
+  ask:'My HbA1c is in the prediabetes band — what should I change first, food or walking?'},
+ {id:'fbs',name:'Fasting Sugar',unit:'mg/dL',panel:'Sugar',lo:70,hi:99,watchHi:125,
+  what:'Blood sugar after an overnight fast of 8–12 hours.',
+  low:'Below 70 can mean low sugar. If you feel shaky or sweaty, eat something sweet and tell your doctor.',
+  ok:'A normal fasting sugar.',
+  watch:'100–125 is the prediabetes band for fasting sugar.',
+  high:'126 or more, on two separate days, is the diabetes range. See your doctor.',
+  ask:'Is my fasting sugar rising over time, or was this a one-off?'},
