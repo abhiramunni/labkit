@@ -266,3 +266,59 @@ footer{margin-top:48px;border-top:1px solid var(--line);padding:26px 0 40px}
 
 <!-- header -->
 <header class="top">
+  <div class="wrap top-in">
+    <a class="logo" href="#top" aria-label="LabKit home">
+      <span class="lg" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 64 64" fill="none"><path d="M20 44h24M20 32h24M20 20h24" stroke="#e8b64c" stroke-width="5" stroke-linecap="round"/></svg></span>
+      <span><b>LabKit</b><small>Blood tests, decoded</small></span>
+    </a>
+    <nav aria-label="Sections">
+      <a href="#decoder">Check a number</a>
+      <a href="#reports">My reports</a>
+      <a href="#trends">Trends</a>
+      <a href="#prep">Before the test</a>
+      <a href="#guides">Guides</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <!-- hero -->
+  <div class="hero">
+    <img class="ph" src="labkit-hero.webp" alt="A blood test report on a wooden desk in warm morning light, with a brass pen and a glass of water" fetchpriority="high">
+    <div class="veil" aria-hidden="true"></div>
+    <div class="copy wrap">
+      <p class="eyebrow" style="color:#e8b64c">Lab reports, finally readable</p>
+      <h1>That report is not a mystery. <em>It is a to-do list.</em></h1>
+      <p>LabKit reads your blood-test numbers the way a kind doctor would — what is fine, what needs attention, and what to ask at your next visit.</p>
+      <p class="disc">LabKit explains. It does not diagnose. Always discuss results with your doctor.</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- latest report card -->
+    <section class="rep-card" aria-label="Latest report summary" id="latestCard"></section>
+
+    <!-- stats -->
+    <div class="stats" id="statsStrip" role="status" aria-label="Summary"></div>
+
+    <!-- decoder -->
+    <section class="block" id="decoder">
+      <div class="dec">
+        <p class="eyebrow" style="color:#e8b64c">Check a number</p>
+        <h2>One number. One plain answer.</h2>
+        <p class="sub">Pick a test from your report, type the number exactly as printed, and LabKit tells you where it sits — and what it means in everyday words.</p>
+        <div class="sexrow">
+          <span class="small" style="color:#e6cfa4;font-weight:700">Ranges for:</span>
+          <span class="seg" role="group" aria-label="Sex for reference ranges">
+            <button type="button" id="sexM" class="on" aria-pressed="true">Male</button>
+            <button type="button" id="sexF" aria-pressed="false">Female</button>
+          </span>
+          <span class="small" style="color:#cbb894">Some ranges differ by sex. Ranges shown are standard adult Indian-lab ranges — your lab's own range is printed on your report.</span>
+        </div>
+        <div class="dec-grid">
+          <div>
+            <div class="testlist" id="testList" role="listbox" aria-label="Tests"></div>
+          </div>
+          <div class="dec-form">
+            <label for="decVal" id="decLabel">Your value</label>
+            <div class="valrow">
