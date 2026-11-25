@@ -64,3 +64,40 @@ header.top{position:sticky;top:0;z-index:60;background:rgba(250,245,236,.92);bac
 .hero .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(28,19,10,.18) 0%,rgba(28,19,10,0) 42%,rgba(28,19,10,.72) 100%)}
 .hero .copy{position:absolute;left:0;right:0;bottom:0;padding:26px 22px 30px;color:#fdf6e7}
 .hero .copy h1{font-size:clamp(34px,6.4vw,58px);line-height:1.04;max-width:640px}
+.hero .copy h1 em{color:var(--gold);font-style:normal}
+.hero .copy p{margin-top:10px;max-width:560px;color:#f2e3c8;font-size:clamp(14.5px,2.4vw,17px)}
+.hero .disc{margin-top:12px;font-size:12.5px;color:#e8d5ae;opacity:.92}
+/* ---------- report card overlapping hero ---------- */
+.rep-card{position:relative;z-index:2;margin-top:-64px;background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--sh2);padding:22px 22px 18px}
+.rep-top{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.rep-top .ic{width:52px;height:52px;flex:none;border-radius:16px;background:var(--paper2);display:grid;place-items:center;color:var(--bronze)}
+.rep-top h2{font-size:clamp(21px,3.4vw,27px);line-height:1.15}
+.rep-top .sub{color:var(--mut);font-size:13.5px;margin-top:3px}
+.flag-pill{margin-left:auto;display:flex;gap:8px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;font-size:12.5px;font-weight:800;letter-spacing:.02em}
+.pill.warn{background:var(--watchbg);color:var(--watch)}
+.pill.ok{background:var(--okbg);color:var(--green)}
+.pill.bad{background:var(--redbg);color:var(--red)}
+.rep-vals{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.rv{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:11px 12px;cursor:pointer;text-align:left;width:100%}
+.rv:hover{border-color:var(--bronze)}
+.rv .nm{font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.02em}
+.rv .vl{font-family:Fraunces,serif;font-size:21px;font-weight:700;margin-top:2px}
+.rv .vl small{font-size:12px;font-family:Inter,sans-serif;font-weight:600;color:var(--mut)}
+.rv .vd{font-size:11.5px;font-weight:800;margin-top:1px}
+.vd.low{color:var(--red)} .vd.high{color:var(--red)} .vd.watch{color:var(--watch)} .vd.ok{color:var(--green)}
+.rep-foot{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center}
+.btn{border:1px solid var(--ink);background:var(--ink);color:#fdf6e7;font-weight:700;font-size:14px;padding:11px 18px;border-radius:99px;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn:hover{background:#3d2d1d}
+.btn.ghost{background:transparent;color:var(--ink);border-color:#cbb894}
+.btn.ghost:hover{background:var(--paper2)}
+.btn.terra{background:var(--terra);border-color:var(--terra)}
+.btn.terra:hover{background:var(--terra-d)}
+/* ---------- stats strip ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh)}
+.stat b{font-family:Fraunces,serif;font-size:30px;display:block;line-height:1.05}
+.stat span{font-size:13px;color:var(--mut);font-weight:600}
+.stat.warn b{color:var(--terra)} .stat.good b{color:var(--green)}
+
+/* ---------- sections ---------- */
